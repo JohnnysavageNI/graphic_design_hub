@@ -1,20 +1,14 @@
 {% extends "base.html" %}
 
-{% load static %}
-
-{% block page_header %}
-    <div class="container header-container">
-        <div class="row">
-            <div class="col"></div>
-        </div>
-    </div>
-{% endblock %}
-
 {% block content %}
+<div class="w-100" 
+     style="background: url('{{ MEDIA_URL }}homepage_background_cropped.jpg') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;">
     <div class="container h-100">
         <div class="row h-100">
-            <div class="col-7 col-md-6 my-auto">
-                <h1 class="display-4 logo-font text-black">
+            <div class="col-12 col-md-6 my-auto">
+                <h1 class="display-4 logo-font text-white">
                     Your next designs are waiting
                 </h1>
                 <div class="my-5">
@@ -25,4 +19,5 @@
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

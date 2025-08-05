@@ -1,16 +1,21 @@
 {% extends 'base.html' %}
+{% block title %}Our Services - Graphic Design Hub{% endblock %}
 {% block content %}
-<h1>Our Design Services</h1>
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+<h1 class="text-center mb-4">Our Design Services</h1>
+<div class="row">
   {% for service in services %}
-    <div style="border:1px solid #ccc; padding:15px; width:250px;">
-      <h2>{{ service.name }}</h2>
-      <p>{{ service.description }}</p>
-      <p><strong>Price:</strong> £{{ service.price }}</p>
-      <a href="{% url 'checkout' service.id %}" style="display:inline-block;padding:8px 15px;background:#007bff;color:#fff;text-decoration:none;border-radius:5px;">Purchase</a>
+    <div class="col-md-4">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ service.name }}</h5>
+          <p class="card-text">{{ service.description }}</p>
+          <p class="card-text fw-bold">£{{ service.price }}</p>
+          <a href="{% url 'checkout' service.id %}" class="btn btn-primary w-100">Purchase</a>
+        </div>
+      </div>
     </div>
   {% empty %}
-    <p>No services available.</p>
+    <p class="text-center">No services available.</p>
   {% endfor %}
 </div>
 {% endblock %}

@@ -6,16 +6,21 @@
             background-size: cover;
             height: 100vh;">
     <div class="container h-100">
-        <div class="row h-100">
-            <div class="col-12 col-md-6 my-auto">
-                <h1 class="display-4 logo-font text-white">
+        <div class="row h-100 align-items-center">
+            <!-- Left Column: Text + Button -->
+            <div class="col-12 col-md-6 text-white">
+                <h1 class="display-4 logo-font">
                     Your next designs are waiting
                 </h1>
                 <div class="my-5">
                     <h4>
-                        <a href="" class="shop-now-button btn btn-lg rounded-0 text-uppercase py-3">Shop Now</a>
+                        <a href="{% url 'service_list' %}" class="shop-now-button btn btn-lg rounded-0 text-uppercase py-3">Services</a>
                     </h4>
                 </div>
+            </div>
+            <!-- Right Column: Image -->
+            <div class="col-12 col-md-6 text-center">
+                <img src="{{ MEDIA_URL }}home_image.jpg" alt="Design preview" class="img-fluid rounded shadow">
             </div>
         </div>
     </div>

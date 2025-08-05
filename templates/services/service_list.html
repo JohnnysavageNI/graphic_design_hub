@@ -1,21 +1,30 @@
-{% extends 'base.html' %}
-{% block title %}Our Services - Graphic Design Hub{% endblock %}
+{% extends "base.html" %}
 {% block content %}
-<h1 class="text-center mb-4">Our Design Services</h1>
-<div class="row">
-  {% for service in services %}
-    <div class="col-md-4">
-      <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">{{ service.name }}</h5>
-          <p class="card-text">{{ service.description }}</p>
-          <p class="card-text fw-bold">£{{ service.price }}</p>
-          <a href="{% url 'checkout' service.id %}" class="btn btn-primary w-100">Purchase</a>
+  <div class="container my-5">
+      <div class="container page-header">
+      <h1 class="text-center mb-5 text-white font-weight-bold text-shadow">Our Design Services</h1>
+  </div>
+    <div class="row">
+        {% for service in services %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}">
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="card-text flex-grow-1">{{ service.description|truncatechars:120 }}</p>
+                    <div class="mt-3">
+                        <p class="h5 mb-3">${{ service.price }}</p>
+                        <a href="{% url 'create_checkout_session' service.id %}" 
+                           class="btn btn-primary btn-block">Order Now</a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+        {% empty %}
+        <p class="text-center w-100">No services available yet.</p>
+        {% endfor %}
     </div>
-  {% empty %}
-    <p class="text-center">No services available.</p>
-  {% endfor %}
 </div>
 {% endblock %}

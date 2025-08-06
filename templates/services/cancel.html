@@ -1,6 +1,10 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block content %}
-<h1>Payment Cancelled</h1>
-<p>Your payment was cancelled. You can try again.</p>
-<a href="{% url 'service_list' %}">Back to Services</a>
+<div class="container text-center py-5 text-white" style="margin-top: 120px;">
+    <i class="fas fa-times-circle fa-4x mb-4" style="color: #dc3545;"></i>
+    <h2 class="mb-3">Payment Cancelled</h2>
+    <p class="lead">It looks like you cancelled the payment process. You can try again anytime.</p>
+    <a href="{% url 'service_list' %}" class="btn btn-primary mt-4">Back to Services</a>
+</div>
 {% endblock %}

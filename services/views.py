@@ -32,3 +32,21 @@ def success(request):
 
 def cancel(request):
     return render(request, 'services/cancel.html')
+
+
+def add_to_cart(request, service_id):
+    cart = request.session.get('cart', [])
+    if service_id not in cart:
+        cart.append(service_id)
+    request.session['cart'] = cart
+    return redirect('view_cart')
+
+
+def view_cart(request):
+    cart = request.session.get('cart', [])
+    services = Service.objects.filter(id__in=cart)
+    total = sum(s.price for s in services)
+    return render(request, 'services/cart.html', {
+        'services': services,
+        'total': total
+    })

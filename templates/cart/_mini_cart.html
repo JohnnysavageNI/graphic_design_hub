@@ -1,0 +1,38 @@
+<aside class="mini-cart-drawer" role="dialog" aria-modal="true" aria-labelledby="miniCartHeading" hidden>
+  <div class="mini-cart-overlay" data-mini-cart-close></div>
+
+  <div class="mini-cart-panel">
+    <header class="mini-cart-header d-flex align-items-center justify-content-between">
+      <h2 id="miniCartHeading" class="h5 mb-0">Your Cart ({{ cart_count|default:0 }})</h2>
+      <button class="mini-cart-close" type="button" aria-label="Close" data-mini-cart-close>&times;</button>
+    </header>
+
+    <div class="mini-cart-body" tabindex="-1">
+      {% if cart_items %}
+        <ul class="list-unstyled mb-2">
+          {% for item in cart_items %}
+            <li class="d-flex justify-content-between">
+              <span>{{ item.service.name }} × {{ item.quantity }}</span>
+              <span>${{ item.lineitem_total|default_if_none:0|floatformat:2 }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="mb-0">Your cart is empty.</p>
+      {% endif %}
+    </div>
+
+    {% if cart_items %}
+      <footer class="mini-cart-footer">
+        <div class="mini-cart-subtotal d-flex justify-content-between align-items-center mb-2">
+          <span>Subtotal</span>
+          <strong>${{ cart_subtotal|default:0|floatformat:2 }}</strong>
+        </div>
+        <div class="mini-cart-actions d-flex gap-2">
+          <a class="btn btn-outline-secondary btn-block mr-2" href="{% url 'view_cart' %}">View Cart</a>
+          <a class="btn btn-primary btn-block" href="{% url 'checkout' %}">Checkout</a>
+        </div>
+      </footer>
+    {% endif %}
+  </div>
+</aside>

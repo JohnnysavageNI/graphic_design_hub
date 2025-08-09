@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Your Cart</h2>
+  <ul>
+    {% for service in services %}
+    <li>{{ service.name }} - ${{ service.price }}</li>
+    {% endfor %}
+  </ul>
+  <h4>Total: ${{ total }}</h4>
+  <a href="{% url 'checkout' %}" class="btn btn-success">Proceed to Checkout</a>
+</div>
+{% endblock %}

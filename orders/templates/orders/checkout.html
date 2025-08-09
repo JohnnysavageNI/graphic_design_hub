@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5 text-white" style="max-width:800px; margin-top:120px;">
+  <h2 class="mb-4">Checkout</h2>
+
+  <div class="mb-3">
+    <ul class="list-unstyled">
+      {% for s in services %}
+        <li>{{ s.name }} — ${{ s.price }}</li>
+      {% endfor %}
+    </ul>
+    <h5>Total: ${{ total }}</h5>
+  </div>
+
+  <form id="payment-form" method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form|crispy }}
+
+    <div class="my-3">
+      <label for="card-element" class="form-label">Card details</label>
+      <div id="card-element" class="form-control py-3"></div>
+      <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+    </div>
+
+    <button id="submit" class="btn btn-primary">Pay securely</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block postloadjs %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe("{{ stripe_publishable_key }}");
+  const elements = stripe.elements();
+  const card = elements.create('card');
+  card.mount('#card-element');
+
+  const form = document.getElementById('payment-form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const clientSecret = "{{ client_secret }}";
+
+    const {error, paymentIntent} = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card }
+    });
+
+    if (error) {
+      document.getElementById('card-errors').textContent = error.message;
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      window.location.href = "{% url 'checkout_success' %}";
+    } else {
+      document.getElementById('card-errors').textContent = 'Payment was not completed.';
+    }
+  });
+</script>
+{% endblock %}

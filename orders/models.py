@@ -1,5 +1,9 @@
-from django.db import models
+from __future__ import annotations
+
+from decimal import Decimal
 from django.conf import settings
+from django.db import models
+from django.utils import timezone
 from services.models import Service
 
 
@@ -9,8 +13,8 @@ class DesignRequest(models.Model):
 
     full_name = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    instructions = models.TextField()  # ← must exist
-    uploaded_file = models.FileField(upload_to='uploads/', blank=True, null=True)  # ← must exist
+    instructions = models.TextField()  # required
+    uploaded_file = models.FileField(upload_to='uploads/', blank=True, null=True)
 
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -24,7 +28,49 @@ class DesignRequest(models.Model):
 
 
 class OrderUpload(models.Model):
-    """Files attached to the final order/request after payment succeeds."""
     request = models.ForeignKey(DesignRequest, related_name='uploads', on_delete=models.CASCADE)
     file = models.FileField(upload_to='order_uploads/%Y/%m/%d/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"OrderUpload #{self.pk} for Request #{self.request_id}"
+
+
+class Order(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="orders"
+    )
+    full_name = models.CharField(max_length=120)
+    email = models.EmailField()
+    instructions = models.TextField(blank=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    stripe_pid = models.CharField(max_length=255, blank=True)  # PaymentIntent or Session id
+    is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self) -> str:
+        return f"Order #{self.pk} - {'PAID' if self.is_paid else 'UNPAID'}"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    service = models.ForeignKey(Service, on_delete=models.PROTECT, related_name="+")
+    qty = models.PositiveIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    line_total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self) -> str:
+        return f"{self.service} × {self.qty}"
+
+
+class Upload(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="uploads")
+    file = models.FileField(upload_to="order_uploads/%Y/%m/%d/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"Upload #{self.pk} for Order #{self.order_id}"

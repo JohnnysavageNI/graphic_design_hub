@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="padding-top: 6rem; padding-bottom: 2rem;">
+  <h1 class="mb-4 text-center">Review Your Order</h1>
+
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <ul class="list-group mb-4">
+        {% for it in order.items.all %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ it.service.name }} × {{ it.qty }}</span>
+            <span>${{ it.line_total|floatformat:2 }}</span>
+          </li>
+        {% endfor %}
+        <li class="list-group-item d-flex justify-content-between font-weight-bold">
+          <span>Total</span>
+          <span>${{ order.total|floatformat:2 }}</span>
+        </li>
+      </ul>
+
+      <form id="payment-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="form-group">
+          <label for="card-element">Card</label>
+          <div id="card-element" class="form-control"></div>
+          <small id="card-errors" class="form-text text-danger" role="alert"></small>
+        </div>
+        <input type="hidden" name="payment_intent_id" id="payment_intent_id">
+        <button id="submit-button" type="submit" class="btn btn-primary px-4">Pay Now</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

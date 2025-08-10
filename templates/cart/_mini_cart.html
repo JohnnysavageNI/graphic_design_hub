@@ -30,7 +30,7 @@
         </div>
         <div class="mini-cart-actions d-flex gap-2">
           <a class="btn btn-outline-secondary btn-block mr-2" href="{% url 'view_cart' %}">View Cart</a>
-          <a class="btn btn-primary btn-block" href="{% url 'checkout' %}">Checkout</a>
+          <a class="btn btn-primary btn-block" href="{% url 'orders:checkout' %}">Checkout</a>
         </div>
       </footer>
     {% endif %}

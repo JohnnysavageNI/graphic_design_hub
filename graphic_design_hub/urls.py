@@ -23,6 +23,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('home.urls')),
     path('services/', include('services.urls')),
-    path('orders/', include('orders.urls')),
+    path('orders/', include(('orders.urls', 'orders'), namespace='orders')),
     path('cart/', include('cart.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

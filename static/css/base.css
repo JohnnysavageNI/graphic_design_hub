@@ -1,5 +1,4 @@
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -106,7 +105,7 @@ body {
 }
 .cart-row .item-left {
   flex: 1;
-  min-width: 0;                  /* allow text-truncate */
+  min-width: 0;
 }
 .cart-row .item-right .item-price {
   width: 6rem;

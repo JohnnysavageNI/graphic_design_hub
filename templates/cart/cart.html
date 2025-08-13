@@ -7,7 +7,6 @@
     <ul class="list-group mb-4" style="max-width: 600px;">
       {% for item in cart_items %}
         <li class="list-group-item bg-dark text-white d-flex align-items-center">
-          <!-- Left: title × qty -->
           <div class="flex-fill pr-2 text-truncate">
             {{ item.service.name }} × {{ item.qty }}
           </div>

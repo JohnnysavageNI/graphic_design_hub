@@ -1,0 +1,12 @@
+# templates/orders/email_confirmation_subject.txt (optional)
+Order #{{ order.id }} confirmation
+
+# templates/orders/email_confirmation.txt (optional)
+Thank you for your order #{{ order.id }}!
+
+Summary:
+{% for it in order.items.all %}- {{ it.service.name }} × {{ it.qty }} = ${{ it.line_total|floatformat:2 }}
+{% endfor %}
+Total: ${{ order.total|floatformat:2 }}
+
+We'll be in touch shortly.

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container" style="padding-top:6rem; padding-bottom:2rem; max-width:720px;">
+  <h1 class="mb-4 text-white">My Profile</h1>
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="text-muted mb-3">Email: {{ request.user.email }}</div>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

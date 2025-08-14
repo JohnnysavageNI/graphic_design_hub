@@ -55,8 +55,8 @@
             {% if request.user.is_superuser %}
               <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
             {% endif %}
-            {% if not request.user.is_superuser %}
-              <li class="nav-item"><a class="nav-link" href="#">My Profile</a></li>
+            {% if request.user.is_authenticated and not request.user.is_superuser %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile' %}">My Profile</a></li>
             {% endif %}
             <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
           {% else %}

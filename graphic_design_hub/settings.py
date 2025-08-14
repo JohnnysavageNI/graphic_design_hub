@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    "accounts.apps.AccountsConfig",
 
     'crispy_forms',
     'crispy_bootstrap4',
@@ -60,14 +61,13 @@ INSTALLED_APPS = [
     'home',
     'services',
     'orders',
-    'accounts',
     'cart',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-AUTH_USER_MODEL = 'accounts.User'
+ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

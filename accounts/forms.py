@@ -15,7 +15,6 @@ class CustomSignupForm(SignupForm):
 
     def save(self, request):
         user = super().save(request)
-        # ensure profile exists (your post_save signal likely creates it)
         profile, _ = Profile.objects.get_or_create(user=user)
         profile.full_name = self.cleaned_data.get("full_name", "").strip()
         profile.save()

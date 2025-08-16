@@ -1,16 +1,94 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-<div class="container" style="padding-top:6rem; padding-bottom:2rem; max-width:720px;">
+<div class="container" style="padding-top:6rem; max-width:980px;">
   <h1 class="mb-4 text-white">My Profile</h1>
-  <div class="card">
+
+  <div class="card mb-4">
     <div class="card-body">
-      <form method="post" novalidate>
-        {% csrf_token %}
-        {{ form|crispy }}
-        <div class="text-muted mb-3">Email: {{ request.user.email }}</div>
-        <button type="submit" class="btn btn-primary">Save changes</button>
-      </form>
+      <div class="d-flex flex-wrap justify-content-between">
+        <div><strong>User:</strong> {{ request.user.username }}</div>
+        <div><strong>Email:</strong> {{ request.user.email }}</div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-pending" role="tab">Pending ({{ pending|length }})</a></li>
+    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-progress" role="tab">In Progress ({{ in_progress|length }})</a></li>
+    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-completed" role="tab">Completed ({{ completed|length }})</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane fade show active" id="tab-pending" role="tabpanel">
+      {% if pending %}
+        <ul class="list-group mb-4">
+          {% for r in pending %}
+            <li class="list-group-item d-flex align-items-center justify-content-between">
+              <div class="mr-3">
+                <div class="font-weight-bold">{{ r.service.name }}</div>
+                <div class="small text-muted">Request #{{ r.id }} • Status: {{ r.get_status_display }}</div>
+              </div>
+              <span class="badge badge-warning">Pending</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="alert alert-info">No pending requests.</div>
+      {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="tab-progress" role="tabpanel">
+      {% if in_progress %}
+        <ul class="list-group mb-4">
+          {% for r in in_progress %}
+            <li class="list-group-item d-flex align-items-center justify-content-between">
+              <div class="mr-3">
+                <div class="font-weight-bold">{{ r.service.name }}</div>
+                <div class="small text-muted">Request #{{ r.id }} • Status: {{ r.get_status_display }}</div>
+              </div>
+              <span class="badge badge-primary">In Progress</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="alert alert-info">No requests in progress.</div>
+      {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="tab-completed" role="tabpanel">
+      {% if completed %}
+        <ul class="list-group mb-4">
+          {% for r in completed %}
+            <li class="list-group-item">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="mr-3">
+                  <div class="font-weight-bold">{{ r.service.name }}</div>
+                  <div class="small text-muted">Request #{{ r.id }} • Status: {{ r.get_status_display }}</div>
+                </div>
+                <span class="badge badge-success">Completed</span>
+              </div>
+              {% if r.uploads.all %}
+                <div class="mt-2">
+                  <div class="small text-muted mb-1">Downloads:</div>
+                  <div class="d-flex flex-wrap">
+                    {% for up in r.uploads.all %}
+                      <a class="btn btn-sm btn-outline-secondary mr-2 mb-2"
+                         href="{% url 'orders:download_upload' up.id %}">
+                        {{ up.file.name|slice:"-40:" }}
+                      </a>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% else %}
+                <div class="small text-muted mt-2">No files available yet.</div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="alert alert-info">No completed requests yet.</div>
+      {% endif %}
     </div>
   </div>
 </div>

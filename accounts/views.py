@@ -1,19 +1,17 @@
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import ProfileForm
+from django.shortcuts import render
+from orders.models import DesignRequest
 
 
-@login_required
+@login_required(login_url="/account/login/")
 def profile_view(request):
-    profile = request.user.profile
-    if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Profile updated.")
-            return redirect("accounts:profile")
-    else:
-        form = ProfileForm(instance=profile)
-
-    return render(request, "accounts/profile.html", {"form": form})
+    qs = DesignRequest.objects.select_related("service").filter(user=request.user)
+    pending = qs.filter(status="pending")
+    in_progress = qs.filter(status="in_progress")
+    completed = qs.filter(status="completed").prefetch_related("uploads")
+    ctx = {
+        "pending": pending,
+        "in_progress": in_progress,
+        "completed": completed,
+    }
+    return render(request, "account/profile.html", ctx)

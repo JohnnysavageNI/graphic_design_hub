@@ -1,14 +1,38 @@
 from django import forms
 
+
 class MultiFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
+
+class MultiFileField(forms.FileField):
+    widget = MultiFileInput
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        if not data:
+            return []
+        if not isinstance(data, (list, tuple)):
+            data = [data]
+        cleaned = []
+        single = forms.FileField(required=self.required, validators=self.validators)
+        for f in data:
+            cleaned.append(single.clean(f, initial))
+        return cleaned
+
+
 class CheckoutForm(forms.Form):
-    full_name = forms.CharField(max_length=120)
-    email = forms.EmailField()
-    instructions = forms.CharField(widget=forms.Textarea(attrs={"rows": 5}), required=False)
-    files = forms.FileField(
-        widget=MultiFileInput(attrs={"multiple": True}),
+    full_name = forms.CharField(max_length=100, required=False, label="Full name")
+    email = forms.EmailField(required=False, label="Email")
+    instructions = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 4}),
         required=False,
-        help_text="You can attach multiple files."
+        label="Instructions for the designer",
+    )
+    uploaded_files = MultiFileField(
+        required=False,
+        widget=MultiFileInput(attrs={"multiple": True}),
+        label="Attach files (you can select multiple)"
     )

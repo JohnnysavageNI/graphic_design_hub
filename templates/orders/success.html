@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container" style="padding-top:6rem;padding-bottom:2rem;">
-  <div class="text-center">
-    <h1 class="mb-3">Thank you!</h1>
-    <p>Your order #{{ order.id }} has been received.</p>
-    <a href="{% url 'service_list' %}" class="btn btn-primary mt-3">Continue Shopping</a>
+<div class="container" style="padding-top:6rem; max-width:720px;">
+  <div class="card">
+    <div class="card-body">
+      {% if design_request %}
+        <h1 class="h4 mb-3">Thanks! Your order was received.</h1>
+        <p class="mb-2"><strong>Request ID:</strong> {{ design_request.id }}</p>
+        <p class="mb-2"><strong>Service:</strong> {{ design_request.service.name }}</p>
+        <p class="mb-2"><strong>Status:</strong> {{ design_request.get_status_display }}</p>
+      {% elif order %}
+        <h1 class="h4 mb-3">Thanks! Your order was received.</h1>
+        <p class="mb-2"><strong>Order ID:</strong> {{ order.id }}</p>
+      {% else %}
+        <h1 class="h4 mb-3">Not found</h1>
+        <p>No order/request found for ID: {{ not_found_id }}</p>
+      {% endif %}
+      <a href="{% url 'accounts:profile' %}" class="btn btn-primary mt-3">Go to My Profile</a>
+    </div>
   </div>
 </div>
 {% endblock %}

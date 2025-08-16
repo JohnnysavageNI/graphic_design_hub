@@ -1,61 +1,96 @@
 (function () {
-  const pubEl = document.getElementById('id_stripe_public_key');
-  const secEl = document.getElementById('id_client_secret');
-  const form = document.getElementById('payment-form');
-  const submitBtn = document.getElementById('submit-button');
-  const cardErrors = document.getElementById('card-errors');
-  const piInput = document.getElementById('payment_intent_id');
+  const form = document.getElementById("payment-form");
+  if (!form) return;
 
-  if (!pubEl || !secEl || !form) return;
+  function readJSON(id) {
+    const el = document.getElementById(id);
+    return el ? JSON.parse(el.textContent) : null;
+  }
 
-  const stripePublicKey = JSON.parse(pubEl.textContent);
-  const clientSecret = JSON.parse(secEl.textContent);
+  const stripePublicKey = readJSON("id_stripe_public_key");
+  const clientSecret    = readJSON("id_client_secret");
 
-  const stripe = Stripe(stripePublicKey, { locale: 'en-GB' });
+  if (!window.Stripe) {
+    console.error("Stripe.js not loaded. Ensure <script src='https://js.stripe.com/v3/'></script> is in base.html before this file.");
+    return;
+  }
+  if (!stripePublicKey) {
+    console.error("Missing stripe_public_key JSON script on the page.");
+    return;
+  }
+  if (!clientSecret) {
+    console.error("Missing client_secret JSON script on the page.");
+    return;
+  }
+
+  const stripe   = Stripe(stripePublicKey);
   const elements = stripe.elements();
 
   const style = {
     base: {
-      color: '#000',
-      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-      fontSmoothing: 'antialiased',
-      fontSize: '16px',
-      '::placeholder': { color: '#6c757d' }
+      color: "#000",
+      fontFamily: '"Lato", "Helvetica Neue", Arial, sans-serif',
+      fontSmoothing: "antialiased",
+      fontSize: "16px",
+      "::placeholder": { color: "#666" },
     },
-    invalid: { color: '#dc3545', iconColor: '#dc3545' }
+    invalid: { color: "#dc3545", iconColor: "#dc3545" },
   };
 
-  const card = elements.create('card', { hidePostalCode: true, style });
-  card.mount('#card-element');
+  const card = elements.create("card", { style, hidePostalCode: true });
 
-  card.on('change', function (event) {
-    if (!cardErrors) return;
-    cardErrors.textContent = event.error ? (event.error.message || 'Invalid card details') : '';
+  const cardElement = document.getElementById("card-element");
+  if (!cardElement) {
+    console.error("No #card-element container in the template.");
+    return;
+  }
+
+  card.mount("#card-element");
+
+  const errorEl = document.getElementById("card-errors");
+  card.on("change", function (event) {
+    if (errorEl) errorEl.textContent = event.error ? event.error.message : "";
   });
 
-  form.addEventListener('submit', async function (e) {
+  const submitBtn = document.getElementById("submit-button");
+  function setLoading(loading) {
+    if (!submitBtn) return;
+    submitBtn.disabled = !!loading;
+    submitBtn.innerText = loading ? "Processing…" : "Pay Now";
+  }
+
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    if (submitBtn) submitBtn.disabled = true;
+    setLoading(true);
+    if (errorEl) errorEl.textContent = "";
 
-    const fullName = document.getElementById('id_full_name')?.value || '';
-    const email = document.getElementById('id_email')?.value || '';
+    try {
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: card,
+          billing_details: {
+            name: (form.querySelector('[name="full_name"]') || {}).value || "",
+            email: (form.querySelector('[name="email"]') || {}).value || "",
+          },
+        },
+      });
 
-    const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: { card, billing_details: { name: fullName, email } }
-    });
+      if (result.error) {
+        if (errorEl) errorEl.textContent = result.error.message || "Payment error.";
+        setLoading(false);
+        return;
+      }
 
-    if (error) {
-      if (cardErrors) cardErrors.textContent = error.message || 'Payment failed. Please check your card details.';
-      if (submitBtn) submitBtn.disabled = false;
-      return;
-    }
-
-    if (paymentIntent && paymentIntent.status === 'succeeded') {
-      if (piInput) piInput.value = paymentIntent.id;
-      form.submit();
-    } else {
-      if (cardErrors) cardErrors.textContent = 'Payment was not completed. Please try again.';
-      if (submitBtn) submitBtn.disabled = false;
+      if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
+        form.submit();
+      } else {
+        if (errorEl) errorEl.textContent = "Payment was not completed. Please try again.";
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      if (errorEl) errorEl.textContent = "Unexpected error. Please try again.";
+      setLoading(false);
     }
   });
 })();

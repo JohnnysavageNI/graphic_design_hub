@@ -1,20 +1,19 @@
-# orders/views.py
 from __future__ import annotations
 from decimal import Decimal
-from typing import Dict, List
+from typing import Dict
 
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse, FileResponse, Http404
 from django.shortcuts import redirect, get_object_or_404, render
-from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from cart.utils import build_cart_context
 from services.models import Service
 from .forms import CheckoutForm
-from .models import Order, OrderItem, Upload
+from .models import Order, DesignRequest, OrderUpload
 
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -31,88 +30,85 @@ def _cart_items_from_ctx(ctx: Dict) -> list[dict]:
     return items
 
 
+@login_required(login_url="/accounts/login/")
 @require_http_methods(["GET", "POST"])
-def checkout(request: HttpRequest) -> HttpResponse:
-    cart_ctx = build_cart_context(request.session)
-    items = _cart_items_from_ctx(cart_ctx)
-    if not items:
-        messages.info(request, "Your cart is empty.")
-        return redirect("view_cart")
+def checkout(request):
+    ctx = build_cart_context(request.session)
+    cart_items = ctx.get("cart_items", [])
+    amount_cents = int(round(float(ctx.get("cart_subtotal") or ctx.get("grand_total") or 0) * 100))
 
-    grand_total = Decimal(str(cart_ctx.get("cart_subtotal") or cart_ctx.get("grand_total") or "0"))
-    amount_cents = int(grand_total * 100)
+    payment_intent = stripe.PaymentIntent.create(
+        amount=max(amount_cents, 0),
+        currency="usd",
+        automatic_payment_methods={"enabled": True},
+    )
+    client_secret = payment_intent.client_secret
+    stripe_public_key = settings.STRIPE_PUBLIC_KEY
 
     if request.method == "POST":
-        payment_intent_id = request.POST.get("payment_intent_id")
         form = CheckoutForm(request.POST, request.FILES)
-        if not payment_intent_id:
-            messages.error(request, "Payment was not completed. Please try again.")
-        elif form.is_valid():
-            paid_ok = False
-            try:
-                pi = stripe.PaymentIntent.retrieve(payment_intent_id)
-                paid_ok = (pi.status == "succeeded")
-            except Exception:
-                paid_ok = False
-
-            order = Order.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                full_name=form.cleaned_data["full_name"],
-                email=form.cleaned_data["email"],
-                instructions=form.cleaned_data.get("instructions", "").strip(),
-                total=grand_total,
-                stripe_pid=payment_intent_id,
-                is_paid=bool(paid_ok),
-            )
-            for it in items:
-                OrderItem.objects.create(
-                    order=order,
-                    service=it["service"],
-                    qty=it["qty"],
-                    unit_price=it["unit_price"],
-                    line_total=it["line_total"],
+        if form.is_valid():
+            created_requests = []
+            for item in cart_items:
+                dr = DesignRequest.objects.create(
+                    user=request.user,
+                    service=item["service"],
+                    full_name=form.cleaned_data.get("full_name") or request.user.get_username(),
+                    email=form.cleaned_data.get("email") or request.user.email,
+                    instructions=form.cleaned_data.get("instructions", ""),
                 )
-            for f in request.FILES.getlist("files"):
-                Upload.objects.create(order=order, file=f)
+                created_requests.append(dr)
 
-            request.session["cart"] = {}
-            request.session.modified = True
+            files = request.FILES.getlist("uploaded_files")
+            if created_requests and files:
+                first_request = created_requests[0]
+                for f in files:
+                    OrderUpload.objects.create(request=first_request, file=f)
 
-            if paid_ok:
-                messages.success(request, f"Payment complete. Order #{order.id} created.")
-            else:
-                messages.warning(request, "Payment pending/failed. We recorded your order and will verify payment.")
-            return redirect(reverse("orders:checkout_success", args=[order.id]))
+            messages.success(request, "Order submitted. We’ll email you once it’s processed.")
+            return redirect("orders:checkout_success", request_id=created_requests[0].id if created_requests else 0)
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = CheckoutForm(initial=({
-            "full_name": (getattr(request.user, "get_full_name", lambda: "")() or request.user.username),
-            "email": request.user.email} if request.user.is_authenticated else {}))
-
-    intent = stripe.PaymentIntent.create(
-        amount=amount_cents,
-        currency=getattr(settings, "STRIPE_CURRENCY", "usd"),
-        automatic_payment_methods={"enabled": True},
-        metadata={"cart_total": str(grand_total)},
-    )
+        initial = {"full_name": request.user.get_username(), "email": request.user.email}
+        form = CheckoutForm(initial=initial)
 
     return render(
         request,
         "orders/checkout.html",
         {
-            **cart_ctx,
+            **ctx,
             "form": form,
-            "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
-            "client_secret": intent.client_secret,
+            "stripe_public_key": stripe_public_key,
+            "client_secret": client_secret,
         },
     )
 
 
-def checkout_success(request, order_id: int):
-    from .models import Order
-    order = get_object_or_404(Order, pk=order_id)
-    request.session["cart"] = {}
-    request.session.modified = True
-    return render(request, "orders/success.html", {"order": order})
+@login_required(login_url="/accounts/login/")
+def checkout_success(request, request_id: int = None, order_id: int = None):
+    pk = request_id if request_id is not None else order_id
+
+    try:
+        dr = DesignRequest.objects.get(pk=pk, user=request.user)
+        request.session["cart"] = {}
+        request.session.modified = True
+        return render(request, "orders/success.html", {"design_request": dr})
+    except DesignRequest.DoesNotExist:
+        pass
+
+    try:
+        order = Order.objects.get(pk=pk)
+        request.session["cart"] = {}
+        request.session.modified = True
+        return render(request, "orders/success.html", {"order": order})
+    except Order.DoesNotExist:
+        return render(
+            request,
+            "orders/success.html",
+            {"not_found_id": pk},
+            status=404,
+        )
 
 
 def checkout_cancel(request):
@@ -122,3 +118,11 @@ def checkout_cancel(request):
 @csrf_exempt
 def stripe_webhook(request):
     return HttpResponse(status=200)
+
+
+@login_required(login_url="/accounts/login/")
+def download_upload(request, upload_id: int):
+    up = get_object_or_404(OrderUpload.objects.select_related("request__user"), pk=upload_id)
+    if (up.request.user_id != request.user.id) and (not request.user.is_superuser):
+        raise Http404("Not found")
+    return FileResponse(up.file.open("rb"), as_attachment=True, filename=up.file.name.rsplit("/", 1)[-1])

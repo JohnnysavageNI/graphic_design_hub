@@ -13,7 +13,8 @@ class DesignRequest(models.Model):
 
     full_name = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    instructions = models.TextField()  # required
+    instructions = models.TextField(blank=False)  # required now
+
     uploaded_file = models.FileField(upload_to='uploads/', blank=True, null=True)
 
     STATUS_CHOICES = [
@@ -24,7 +25,11 @@ class DesignRequest(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self) -> str:
-        return f"DesignRequest from {self.full_name or self.user}"
+        return f"DesignRequest #{self.pk} — {self.service.name}"
+
+    @property
+    def uploads_count(self) -> int:
+        return self.uploads.count()
 
 
 class OrderUpload(models.Model):
@@ -33,7 +38,7 @@ class OrderUpload(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"OrderUpload #{self.pk} for Request #{self.request_id}"
+        return f"Upload #{self.pk} for Request #{self.request_id}"
 
 
 class Order(models.Model):

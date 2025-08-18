@@ -1,95 +1,61 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container" style="padding-top:6rem; max-width:980px;">
-  <h1 class="mb-4 text-white">My Profile</h1>
+<div class="container" style="padding-top:6rem; max-width:900px;">
+  <h1 class="text-white mb-4">My Profile</h1>
 
   <div class="card mb-4">
-    <div class="card-body">
-      <div class="d-flex flex-wrap justify-content-between">
-        <div><strong>User:</strong> {{ request.user.username }}</div>
-        <div><strong>Email:</strong> {{ request.user.email }}</div>
-      </div>
-    </div>
+    <div class="card-header"><strong>Live Orders (Pending / In Progress)</strong></div>
+    <ul class="list-group list-group-flush">
+      {% if in_progress %}
+        {% for r in in_progress %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div><strong>#{{ r.id }}</strong> — {{ r.service.name }}</div>
+              <div class="small text-muted">Status: {{ r.get_status_display }}</div>
+              {% if r.instructions %}<div class="small">{{ r.instructions|linebreaksbr }}</div>{% endif %}
+            </div>
+            {% if r.uploads.count %}
+              <span class="badge badge-secondary">{{ r.uploads.count }} file(s)</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="list-group-item">No live orders.</li>
+      {% endif %}
+    </ul>
   </div>
 
-  <ul class="nav nav-tabs mb-3" role="tablist">
-    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-pending" role="tab">Pending ({{ pending|length }})</a></li>
-    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-progress" role="tab">In Progress ({{ in_progress|length }})</a></li>
-    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-completed" role="tab">Completed ({{ completed|length }})</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane fade show active" id="tab-pending" role="tabpanel">
-      {% if pending %}
-        <ul class="list-group mb-4">
-          {% for r in pending %}
-            <li class="list-group-item d-flex align-items-center justify-content-between">
-              <div class="mr-3">
-                <div class="font-weight-bold">{{ r.service.name }}</div>
-                <div class="small text-muted">Request #{{ r.id }} • Status: {{ r.get_status_display }}</div>
-              </div>
-              <span class="badge badge-warning">Pending</span>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <div class="alert alert-info">No pending requests.</div>
-      {% endif %}
-    </div>
-
-    <div class="tab-pane fade" id="tab-progress" role="tabpanel">
-      {% if in_progress %}
-        <ul class="list-group mb-4">
-          {% for r in in_progress %}
-            <li class="list-group-item d-flex align-items-center justify-content-between">
-              <div class="mr-3">
-                <div class="font-weight-bold">{{ r.service.name }}</div>
-                <div class="small text-muted">Request #{{ r.id }} • Status: {{ r.get_status_display }}</div>
-              </div>
-              <span class="badge badge-primary">In Progress</span>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <div class="alert alert-info">No requests in progress.</div>
-      {% endif %}
-    </div>
-
-    <div class="tab-pane fade" id="tab-completed" role="tabpanel">
+  <div class="card">
+    <div class="card-header"><strong>Completed Orders</strong></div>
+    <ul class="list-group list-group-flush">
       {% if completed %}
-        <ul class="list-group mb-4">
-          {% for r in completed %}
-            <li class="list-group-item">
-              <div class="d-flex align-items-center justify-content-between">
-                <div class="mr-3">
-                  <div class="font-weight-bold">{{ r.service.name }}</div>
-                  <div class="small text-muted">Request #{{ r.id }} • Status: {{ r.get_status_display }}</div>
-                </div>
-                <span class="badge badge-success">Completed</span>
+        {% for r in completed %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div><strong>#{{ r.id }}</strong> — {{ r.service.name }}</div>
+                {% if r.instructions %}<div class="small text-muted">{{ r.instructions|truncatechars:140 }}</div>{% endif %}
               </div>
-              {% if r.uploads.all %}
-                <div class="mt-2">
-                  <div class="small text-muted mb-1">Downloads:</div>
-                  <div class="d-flex flex-wrap">
-                    {% for up in r.uploads.all %}
-                      <a class="btn btn-sm btn-outline-secondary mr-2 mb-2"
-                         href="{% url 'orders:download_upload' up.id %}">
-                        {{ up.file.name|slice:"-40:" }}
-                      </a>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% else %}
-                <div class="small text-muted mt-2">No files available yet.</div>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
+              <span class="badge badge-success">Completed</span>
+            </div>
+            {% if r.uploads.count %}
+              <div class="mt-2">
+                {% for up in r.uploads.all %}
+                  <a class="btn btn-sm btn-outline-primary mr-2 mb-2"
+                     href="{% url 'orders:download_upload' up.id %}">
+                    Download file {{ forloop.counter }}
+                  </a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="small text-muted mt-2">No deliverables uploaded yet.</div>
+            {% endif %}
+          </li>
+        {% endfor %}
       {% else %}
-        <div class="alert alert-info">No completed requests yet.</div>
+        <li class="list-group-item">No completed orders yet.</li>
       {% endif %}
-    </div>
+    </ul>
   </div>
 </div>
 {% endblock %}

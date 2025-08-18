@@ -5,11 +5,8 @@ class MultiFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
 
-class MultiFileField(forms.FileField):
+class MultipleFileField(forms.FileField):
     widget = MultiFileInput
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
         if not data:
@@ -28,10 +25,10 @@ class CheckoutForm(forms.Form):
     email = forms.EmailField(required=False, label="Email")
     instructions = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 4}),
-        required=False,
+        required=True,
         label="Instructions for the designer",
     )
-    uploaded_files = MultiFileField(
+    uploaded_files = MultipleFileField(
         required=False,
         widget=MultiFileInput(attrs={"multiple": True}),
         label="Attach files (you can select multiple)"

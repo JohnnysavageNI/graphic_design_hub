@@ -4,7 +4,6 @@
       autohide: true,
       delay: 3500
     }).toast('show').on('hidden.bs.toast', function () {
-      // remove toast DOM when done to prevent stacking
       const $t = $(this);
       const $container = $t.closest('.toast-container, .position-fixed, #toast-root');
       $t.remove();
@@ -17,7 +16,6 @@
   $(function () {
     wireToasts(document);
 
-    // Optional helper if you use AJAX to return `toast_html`
     window.showToastHtml = function (html) {
       const mount = document.getElementById('toast-root') || (function () {
         const d = document.createElement('div');

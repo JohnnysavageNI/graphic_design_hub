@@ -11,22 +11,16 @@
   {% block extra_meta %}{% endblock %}
 
   {% block corecss %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&display=swap">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
   {% endblock %}
 
   {% block corejs %}
     <script src="https://kit.fontawesome.com/3348633986.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"
-            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-            crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="https://js.stripe.com/v3/"></script>
   {% endblock %}
 
@@ -64,8 +58,8 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
           {% endif %}
 
-          <li class="nav-item position-relative">
-            <a href="{% url 'view_cart' %}" class="nav-link">
+          <li class="nav-item position-relative" id="cart-link-wrap">
+            <a href="{% url 'view_cart' %}" class="nav-link" id="cart-link">
               <i class="fas fa-shopping-bag"></i>
               {% if grand_total %} ${{ grand_total|floatformat:2 }} {% else %} $0.00 {% endif %}
             </a>
@@ -81,19 +75,32 @@
 
 {% block postloadjs %}
   <script src="{% static 'js/toasts.js' %}"></script>
-  {# No mini-cart drawer JS anymore #}
+  <script src="{% static 'js/messages.js' %}"></script>
 {% endblock %}
 
-{# Single server-rendered messages block for toasts #}
+{# Cart toast (server-rendered only for cart_toast messages) #}
 {% if messages %}
-  <div class="position-fixed p-3" style="top: 80px; right: 20px; z-index: 2000;">
+  <div id="cart-toast-server" class="position-fixed p-3" style="top: 80px; right: 20px; z-index: 2000;">
     {% for message in messages %}
-      {{ message|safe }}
+      {% if 'cart_toast' in message.tags %}
+        <div class="toast-container mb-2">{{ message|safe }}</div>
+      {% endif %}
     {% endfor %}
   </div>
 {% endif %}
 
-{# Optional: AJAX-injected toasts mount point (keep if you use AJAX adds) #}
+{# Auth popups data (excluding cart_toast) #}
+{% if messages %}
+  <div id="auth-messages-data" class="d-none">
+    {% for message in messages %}
+      {% if not 'cart_toast' in message.tags %}
+        <div class="auth-msg" data-level="{{ message.tags|default:'info'|escape }}">{{ message }}</div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
+<div id="auth-toast-root" aria-live="polite" aria-atomic="true"></div>
+
 <div id="toast-root" aria-live="polite" aria-atomic="true"></div>
 
 </body>

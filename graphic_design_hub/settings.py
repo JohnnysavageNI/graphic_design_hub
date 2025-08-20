@@ -191,3 +191,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # -------------------------------
 # Single place to read/write the cart in request.session
 CART_SESSION_ID = 'cart'
+
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+PROTECTED_MEDIA_ROOT = BASE_DIR / "protected_media"
+PROTECTED_MEDIA_URL = "/pmedia/"
+
+SECURE_CONTENT_TYPE_NOSNIFF = True

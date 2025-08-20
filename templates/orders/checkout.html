@@ -35,6 +35,11 @@
             {% csrf_token %}
             {{ form|crispy }}
 
+            <ul id="selected-files" class="small text-muted mb-3"></ul>
+            <p class="small text-muted mb-0">
+              Tip: you can select files in batches — each new selection will be added.
+            </p>
+
             <div class="form-group">
               <label for="card-element">Card</label>
               <div id="card-element" class="form-control"></div>
@@ -61,4 +66,5 @@
 {% block postloadjs %}
   {{ block.super }}
   <script src="{% static 'orders/js/stripe_elements.js' %}"></script>
+  <script src="{% static 'orders/js/files_append.js' %}"></script>
 {% endblock %}

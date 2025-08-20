@@ -123,6 +123,9 @@ def stripe_webhook(request):
 @login_required(login_url="/accounts/login/")
 def download_upload(request, upload_id: int):
     up = get_object_or_404(OrderUpload.objects.select_related("request__user"), pk=upload_id)
-    if (up.request.user_id != request.user.id) and (not request.user.is_superuser):
+    if (up.request.user_id != request.user.id) and (not request.user.is_staff):
         raise Http404("Not found")
-    return FileResponse(up.file.open("rb"), as_attachment=True, filename=up.file.name.rsplit("/", 1)[-1])
+    filename = up.file.name.rsplit("/", 1)[-1]
+    resp = FileResponse(up.file.open("rb"), as_attachment=True, filename=filename)
+    resp["X-Content-Type-Options"] = "nosniff"
+    return resp

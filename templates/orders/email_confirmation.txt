@@ -1,0 +1,16 @@
+Hi {{ full_name|default:"there" }},
+
+Thanks for your order. Here’s a summary:
+
+{% for it in items %}
+- {{ it.service.name }} × {{ it.qty }} = ${{ it.line_total|floatformat:2 }}
+{% endfor %}
+
+Total: ${{ total|floatformat:2 }}
+
+{% if instructions %}
+Instructions:
+{{ instructions }}
+{% endif %}
+
+We’ll be in touch soon.

@@ -1,4 +1,3 @@
-# orders/webhook_handler.py
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.conf import settings
@@ -8,7 +7,6 @@ from .models import Order
 
 
 class StripeWHHandler:
-
     def __init__(self, request):
         self.request = request
 
@@ -16,10 +14,10 @@ class StripeWHHandler:
         return HttpResponse(content=f"Unhandled event: {event['type']}", status=200)
 
     def _send_confirmation_email(self, order: Order) -> None:
-        context = {"order": order}
+        ctx = {"order": order}
         try:
-            subject = render_to_string("orders/email_confirmation_subject.txt", context).strip()
-            body = render_to_string("orders/email_confirmation.txt", context)
+            subject = render_to_string("orders/email_confirmation_subject.txt", ctx).strip()
+            body = render_to_string("orders/email_confirmation.txt", ctx)
         except TemplateDoesNotExist:
             subject = f"Order #{order.id} payment received"
             lines = [f"Thanks! We received your payment for order #{order.id}.", "", "Summary:"]
@@ -42,9 +40,14 @@ class StripeWHHandler:
         pid = intent.get("id")
 
         try:
-            order = Order.objects.select_related().prefetch_related("items").get(stripe_pid=pid)
+            order = (
+                Order.objects
+                .select_related()
+                .prefetch_related("items")
+                .get(stripe_pid=pid)
+            )
         except Order.DoesNotExist:
-            return HttpResponse(content="PI succeeded but order not found", status=200)
+            return HttpResponse(content=f"PI succeeded but order not found for pid={pid}", status=200)
 
         if not order.is_paid:
             order.is_paid = True

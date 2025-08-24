@@ -1,6 +1,6 @@
 from __future__ import annotations
 from decimal import Decimal
-from typing import Dict
+from typing import Dict, List
 
 from django.conf import settings
 from django.contrib import messages
@@ -89,28 +89,39 @@ def checkout(request):
     if request.method == "POST":
         form = CheckoutForm(request.POST, request.FILES)
         if form.is_valid():
-            created_requests: list[DesignRequest] = []
+            created_requests: List[DesignRequest] = []
+
+            full_name = form.cleaned_data.get("full_name") or request.user.get_username()
+            email = form.cleaned_data.get("email") or request.user.email
+            instructions = form.cleaned_data.get("instructions", "")
+
             for raw in cart_items:
-                dr = DesignRequest.objects.create(
-                    user=request.user,
-                    service=raw["service"],
-                    full_name=form.cleaned_data.get("full_name") or request.user.get_username(),
-                    email=form.cleaned_data.get("email") or request.user.email,
-                    instructions=form.cleaned_data.get("instructions", ""),
-                )
-                created_requests.append(dr)
+                service = raw["service"]
+                qty = int(raw.get("qty") or 1)
+                for _ in range(qty):
+                    dr = DesignRequest.objects.create(
+                        user=request.user,
+                        service=service,
+                        full_name=full_name,
+                        email=email,
+                        instructions=instructions,
+                    )
+                    created_requests.append(dr)
 
             files = request.FILES.getlist("uploaded_files")
             if created_requests and files:
                 first_request = created_requests[0]
                 for f in files:
-                    OrderUpload.objects.create(request=first_request, file=f)
+                    if hasattr(OrderUpload, "original_file"):
+                        OrderUpload.objects.create(request=first_request, original_file=f)
+                    else:
+                        OrderUpload.objects.create(request=first_request, file=f)
 
-            email_to = form.cleaned_data.get("email") or request.user.email
+            email_to = email
             email_ctx = {
-                "full_name": form.cleaned_data.get("full_name") or request.user.get_username(),
+                "full_name": full_name,
                 "email": email_to,
-                "instructions": form.cleaned_data.get("instructions", ""),
+                "instructions": instructions,
                 "items": _cart_items_from_ctx(ctx),
                 "total": Decimal(str(ctx.get("cart_subtotal") or ctx.get("grand_total") or "0.00")),
             }
@@ -177,7 +188,15 @@ def download_upload(request, upload_id: int):
     up = get_object_or_404(OrderUpload.objects.select_related("request__user"), pk=upload_id)
     if (up.request.user_id != request.user.id) and (not request.user.is_staff):
         raise Http404("Not found")
-    filename = up.file.name.rsplit("/", 1)[-1]
-    resp = FileResponse(up.file.open("rb"), as_attachment=True, filename=filename)
+
+    f = getattr(up, "file", None)
+    if f is None or not getattr(f, "name", None):
+        f = getattr(up, "original_file", None)
+
+    if f is None:
+        raise Http404("File not found")
+
+    filename = f.name.rsplit("/", 1)[-1]
+    resp = FileResponse(f.open("rb"), as_attachment=True, filename=filename)
     resp["X-Content-Type-Options"] = "nosniff"
     return resp

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container" style="padding-top:6rem; padding-bottom:2rem;">
+  <h1 class="text-white mb-4">Edit Request #{{ dr.id }}</h1>
+  <div class="card">
+    <div class="card-header"><strong>{{ dr.service.name }}</strong> × {{ dr.qty }}</div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="form-group">
+          <label>Add more reference files (optional)</label>
+          {{ files_form.new_files }}
+          <small class="form-text text-muted">You can upload multiple files.</small>
+        </div>
+        <button class="btn btn-primary">Save</button>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary ml-2">Back</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

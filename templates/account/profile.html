@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
 <div class="container" style="padding-top:6rem; padding-bottom:2rem;">
   <h1 class="text-white mb-4">My Profile</h1>
@@ -16,13 +18,31 @@
                   <div>
                     <div class="font-weight-bold">{{ r.service.name }}</div>
                     <div class="small text-muted">
-                      Status: {{ r.get_status_display }}{% if r.qty %} • Qty: {{ r.qty }}{% endif %}
+                      Status: {{ r.get_status_display }}{% if r.qty %} • Qty: {{ r.qty }}{% endif %} • Ref: #{{ r.id }}
                     </div>
                     {% if r.instructions %}
                       <div class="small mt-1">Notes: {{ r.instructions|truncatechars:120 }}</div>
                     {% endif %}
                   </div>
-                  <span class="badge badge-info">{{ r.id }}</span>
+
+                  <div class="btn-group" role="group" aria-label="Actions">
+                    {% if r.status == 'pending' %}
+                      <a href="{% url 'accounts:request_edit' r.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    {% endif %}
+
+                    {% if r.status in 'pending,in_progress'|cut:',' %}
+                      <button type="button"
+                              class="btn btn-sm btn-outline-danger"
+                              data-toggle="modal"
+                              data-target="#confirmDeleteModal"
+                              data-delete-url="{% url 'accounts:request_delete' r.id %}"
+                              data-item-label="{{ r.service.name }} (Ref: #{{ r.id }})">
+                        Delete
+                      </button>
+                    {% else %}
+                      <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Locked</button>
+                    {% endif %}
+                  </div>
                 </li>
               {% endfor %}
             </ul>
@@ -56,13 +76,16 @@
                       <div class="mt-2">
                         {% for up in finals %}
                           {% if up.file or up.original_file %}
-                            {# Prefer final file if present; else original #}
                             {% if up.file %}
                               <a class="btn btn-sm btn-outline-primary mr-2 mb-2"
-                                 href="{% url 'orders:download_upload' up.id %}">Download {% if up.note %}({{ up.note }}){% else %}file{% endif %}</a>
+                                 href="{% url 'orders:download_upload' up.id %}">
+                                Download {% if up.note %}({{ up.note }}){% else %}file{% endif %}
+                              </a>
                             {% elif up.original_file %}
                               <a class="btn btn-sm btn-outline-secondary mr-2 mb-2"
-                                 href="{% url 'orders:download_upload' up.id %}">Download original</a>
+                                 href="{% url 'orders:download_upload' up.id %}">
+                                Download original
+                              </a>
                             {% endif %}
                           {% endif %}
                         {% endfor %}
@@ -82,4 +105,33 @@
     </div>
   </div>
 </div>
+
+<!-- Shared Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteTitle">Confirm deletion</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="delete-form" method="post" action="">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p class="mb-0">Are you sure you want to delete <strong id="delete-item-label">this item</strong>? This cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-light" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Yes, delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block postloadjs %}
+  {{ block.super }}
+  <script src="{% static 'js/profile.js' %}"></script>
 {% endblock %}

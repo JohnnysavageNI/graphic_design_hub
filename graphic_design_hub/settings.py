@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+if os.path.isfile('env.py'):
+    import env 
+import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -24,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # NOTE: Move this to environment variable for production
-SECRET_KEY = 'django-insecure-bf_nx7m0sd(kbofoqv1g*ba))$ux)2(ju#mr-kr5#21@5iql_d'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # Payments (Stripe)
 STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
@@ -36,7 +39,9 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1',
-                 'localhost',]
+                 'localhost',
+                 'https://graphic-design-hub-5b62ec6c28b6.herokuapp.com/',
+]
 
 
 # Application definition
@@ -131,13 +136,17 @@ WSGI_APPLICATION = 'graphic_design_hub.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
-}
-
+else: 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

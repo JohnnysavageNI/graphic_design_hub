@@ -1,0 +1,1 @@
+web: gunicorn graphic-design-hub.wsgi:application

@@ -1,4 +1,3 @@
-# path: graphic_design_hub/settings.py
 """
 Django settings for graphic_design_hub project.
 

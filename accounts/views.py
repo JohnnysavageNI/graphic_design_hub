@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from orders.models import DesignRequest, OrderUpload
 from .forms import DesignRequestEditForm
 
+
 # ----- Forms -----
 class RequestEditForm(forms.ModelForm):
     class Meta:
@@ -13,11 +14,14 @@ class RequestEditForm(forms.ModelForm):
         fields = ["instructions"]
         widgets = {"instructions": forms.Textarea(attrs={"rows": 4})}
 
+
 def _can_edit(dr: DesignRequest) -> bool:
     return getattr(dr, "status", "pending") == "pending"
 
+
 def _can_delete(dr: DesignRequest) -> bool:
     return getattr(dr, "status", "pending") in ("pending", "in_progress")
+
 
 # ----- Views -----
 @login_required
@@ -43,6 +47,7 @@ def profile_view(request):
         },
     )
 
+
 @login_required
 def request_edit(request, pk):
     dr = get_object_or_404(DesignRequest, pk=pk, user=request.user)
@@ -60,6 +65,7 @@ def request_edit(request, pk):
         form = RequestEditForm(instance=dr)
 
     return render(request, "account/request_edit.html", {"dr": dr, "form": form})
+
 
 @login_required
 @require_POST

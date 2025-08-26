@@ -20,7 +20,7 @@ class CustomSignupForm(SignupForm):
         profile.full_name = self.cleaned_data.get("full_name", "").strip()
         profile.save()
         return user
-    
+
 
 class DesignRequestEditForm(forms.ModelForm):
     class Meta:

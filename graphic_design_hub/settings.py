@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 if os.path.isfile('env.py'):
-    import env 
+    import env
 import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
@@ -38,9 +38,10 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1',
-                 'localhost',
-                 'https://graphic-design-hub-5b62ec6c28b6.herokuapp.com/',
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'https://graphic-design-hub.herokuapp.com/',
 ]
 
 
@@ -140,7 +141,7 @@ if 'DATABASE_URL' in os.environ:
     DATABASES = {
         'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
-else: 
+else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

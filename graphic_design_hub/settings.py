@@ -4,7 +4,7 @@ import dj_database_url
 from dotenv import load_dotenv
 
 if os.path.isfile("env.py"):
-    import env
+    import env  # noqa: F401
 
 load_dotenv()
 
@@ -152,16 +152,8 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
-PROTECTED_MEDIA_ROOT = BASE_DIR / "protected_media"
-PROTECTED_MEDIA_URL = "/pmedia/"
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-CART_SESSION_ID = "cart"
 
 USE_AWS = os.getenv("USE_AWS", "false").lower() in {"1", "true", "yes"}
 
@@ -176,32 +168,26 @@ if USE_AWS:
     AWS_S3_FILE_OVERWRITE = False
     AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
 
-STORAGES = {
-    "default": (
-        {
+    STORAGES = {
+        "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {"location": "media", "file_overwrite": False},
-        }
-        if USE_AWS
-        else {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-            "OPTIONS": {"location": str(BASE_DIR / "media")},
-        }
-    ),
-    "staticfiles": (
-        {
+        },
+        "staticfiles": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {"location": "static"},
-        }
-        if USE_AWS
-        else {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        }
-    ),
-}
+        },
+    }
 
-STATIC_URL = (
-    f"https://{AWS_S3_CUSTOM_DOMAIN}/static/" if USE_AWS else "/static/"
-)
-MEDIA_URL = (
-    f"https://{AWS_S3_CUSTOM_DOMAIN}/media/" if USE_AWS else "/media/"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {"location": str(MEDIA_ROOT)},
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }

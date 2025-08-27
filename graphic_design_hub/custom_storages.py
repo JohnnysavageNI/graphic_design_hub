@@ -10,4 +10,4 @@ class StaticStorage(S3Boto3Storage):
 class MediaStorage(S3Boto3Storage):
     default_acl = None
     file_overwrite = False
-    location = settings.MEDIAFILES_LOCATION 
+    location = settings.MEDIAFILES_LOCATION

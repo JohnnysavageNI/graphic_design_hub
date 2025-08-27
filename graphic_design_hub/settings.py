@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from pathlib import Path
 import os
+if os.path.isfile('env.py'):
+    import env
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -26,10 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # Prefer env toggle so local dev can run without code changes
-DEBUG = os.environ.get("DEBUG", "False").lower() in {"1", "true", "yes", "on"}
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    "graphic-design-hub.herokuapp.com",
+    ".herokuapp.com",
     "localhost",
     "127.0.0.1",
 ]

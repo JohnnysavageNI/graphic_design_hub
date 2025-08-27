@@ -211,28 +211,23 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-USE_AWS = os.getenv("USE_AWS", "false").lower() in {"1","true","yes"}
+USE_AWS = os.getenv("USE_AWS", "false").lower() in {"1", "true", "yes"}
 
 if USE_AWS:
     AWS_STORAGE_BUCKET_NAME = "graphicdesignhub"
     AWS_S3_REGION_NAME = "eu-north-1"
     AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
     AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
-    AWS_S3_SIGNATURE_VERSION = "s3v4"
-    AWS_S3_ADDRESSING_STYLE = "virtual"
-    AWS_DEFAULT_ACL = None
-    AWS_S3_FILE_OVERWRITE = False
 
-    STATICFILES_LOCATION = "static"
-    MEDIAFILES_LOCATION  = "media"
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_S3_ADDRESSING_STYLE  = "virtual"
+    AWS_DEFAULT_ACL          = None
+    AWS_S3_FILE_OVERWRITE    = False
 
     AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
 
-    STATICFILES_STORAGE = "graphic_design_hub.custom_storages.StaticStorage"
-    DEFAULT_FILE_STORAGE = "graphic_design_hub.custom_storages.MediaStorage"
-
-    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/"
-    MEDIA_URL  = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/"
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3StaticStorage"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
 
 PROTECTED_MEDIA_ROOT = BASE_DIR / "protected_media"
 PROTECTED_MEDIA_URL = "/pmedia/"

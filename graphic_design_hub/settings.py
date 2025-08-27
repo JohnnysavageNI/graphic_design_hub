@@ -196,3 +196,5 @@ else:
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
+
+USE_AWS = USE_AWS

@@ -12,9 +12,9 @@ from .webhook_handler import StripeWHHandler
 def stripe_webhook(request):
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
-    webhook_secret = getattr(settings, "STRIPE_WEBHOOK_SECRET", None) or getattr(settings, "STRIPE_WH_SECRET", None)
+    webhook_secret = getattr(settings, "STRIPE_WH_SECRET", None) or getattr(settings, "STRIPE_WH_SECRET", None)
     if not webhook_secret:
-        return HttpResponse("Missing STRIPE_WEBHOOK_SECRET", status=400)
+        return HttpResponse("Missing STRIPE_WH_SECRET", status=400)
 
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")

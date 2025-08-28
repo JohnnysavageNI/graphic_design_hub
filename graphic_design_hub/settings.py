@@ -4,7 +4,7 @@ import dj_database_url
 from dotenv import load_dotenv
 
 if os.path.isfile("env.py"):
-    import env  # noqa: F401
+    import env
 
 load_dotenv()
 
@@ -35,7 +35,7 @@ if not DEBUG:
 
 STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
-STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_Wh_SECRET = os.environ.get("STRIPE_WH_SECRET", "")
 
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"

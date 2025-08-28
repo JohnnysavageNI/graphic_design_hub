@@ -161,11 +161,11 @@ PROTECTED_MEDIA_ROOT = BASE_DIR / "protected_media"
 PROTECTED_MEDIA_URL = "/pmedia/"
 
 if 'USE_AWS' in os.environ:
-     AWS_S3_OBJECT_PARAMETERS = {
+    AWS_S3_OBJECT_PARAMETERS = {
         'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
         'CacheControl': 'max-age=94608000',
     }
-     
+
     # Bucket Config
     AWS_STORAGE_BUCKET_NAME = 'graphicdesignhub'
     AWS_S3_REGION_NAME = 'eu-north-1'

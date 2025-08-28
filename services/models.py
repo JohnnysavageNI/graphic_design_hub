@@ -8,8 +8,8 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2)
     image = models.ImageField(
         storage=MediaStorage(),
-        upload_to="service_images/", 
-        blank=True, 
+        upload_to="service_images/",
+        blank=True,
         null=True
     )
     stripe_price_id = models.CharField(max_length=100)

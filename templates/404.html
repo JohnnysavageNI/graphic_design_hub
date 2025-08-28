@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head_title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="padding-top:6rem; padding-bottom:4rem;">
+  <h1 class="display-4 text-white mb-3">Oops! Page Not Found</h1>
+  <p class="lead text-light mb-4">
+    Sorry, the page you are looking for doesn’t exist or has been moved.
+  </p>
+
+  <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+    <div class="card-body">
+      <img src="{% static 'img/404.png' %}" alt="404 Error" class="img-fluid mb-4">
+      <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+        Back to Home
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

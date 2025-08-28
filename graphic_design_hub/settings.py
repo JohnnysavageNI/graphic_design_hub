@@ -35,7 +35,7 @@ if not DEBUG:
 
 STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
-STRIPE_Wh_SECRET = os.environ.get("STRIPE_WH_SECRET", "")
+STRIPE_WH_SECRET = os.environ.get("STRIPE_WH_SECRET", "")
 
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"

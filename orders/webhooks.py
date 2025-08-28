@@ -7,12 +7,12 @@ import stripe
 from .webhook_handler import StripeWHHandler
 
 
-@require_POST
 @csrf_exempt
+@require_POST
 def stripe_webhook(request):
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
-    webhook_secret = getattr(settings, "STRIPE_WH_SECRET", None) or getattr(settings, "STRIPE_WH_SECRET", None)
+    webhook_secret = getattr(settings, "STRIPE_WH_SECRET", None)
     if not webhook_secret:
         return HttpResponse("Missing STRIPE_WH_SECRET", status=400)
 
@@ -29,4 +29,5 @@ def stripe_webhook(request):
         "payment_intent.succeeded": handler.handle_payment_intent_succeeded,
         "payment_intent.payment_failed": handler.handle_payment_intent_payment_failed,
     }
+
     return event_map.get(event.get("type"), handler.handle_event)(event)

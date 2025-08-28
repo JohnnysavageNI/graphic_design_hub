@@ -161,6 +161,11 @@ PROTECTED_MEDIA_ROOT = BASE_DIR / "protected_media"
 PROTECTED_MEDIA_URL = "/pmedia/"
 
 if 'USE_AWS' in os.environ:
+     AWS_S3_OBJECT_PARAMETERS = {
+        'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
+        'CacheControl': 'max-age=94608000',
+    }
+     
     # Bucket Config
     AWS_STORAGE_BUCKET_NAME = 'graphicdesignhub'
     AWS_S3_REGION_NAME = 'eu-north-1'
@@ -173,22 +178,6 @@ if 'USE_AWS' in os.environ:
     STATICFILES_LOCATION = 'static'
     DEFAULT_FILE_STORAGE = 'custom_storages.MediaStorage'
     MEDIAFILES_LOCATION = 'media'
-
-    STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "location": "media",
-            "file_overwrite": False,
-        },
-    },
-    "staticfiles": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        "OPTIONS": {
-            "location": "static",
-        },
-    },
-}
 
     # Override static and media URLs in production
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'

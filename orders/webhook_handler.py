@@ -11,18 +11,32 @@ class StripeWHHandler:
         self.request = request
 
     def handle_event(self, event):
-        return HttpResponse(content=f"Unhandled event: {event['type']}", status=200)
+        return HttpResponse(
+            content=f"Unhandled event: {event['type']}",
+            status=200,
+        )
 
     def _send_confirmation_email(self, order: Order) -> None:
         ctx = {"order": order}
         try:
-            subject = render_to_string("orders/email_confirmation_subject.txt", ctx).strip()
+            subject = render_to_string(
+                "orders/email_confirmation_subject.txt", ctx
+            ).strip()
             body = render_to_string("orders/email_confirmation.txt", ctx)
         except TemplateDoesNotExist:
             subject = f"Order #{order.id} payment received"
-            lines = [f"Thanks! We received your payment for order #{order.id}.", "", "Summary:"]
+            lines = [
+                f"Thanks! We received your payment for order #{order.id}.",
+                "",
+                "Summary:",
+            ]
             for it in order.items.all():
-                lines.append(f"- {it.service.name} × {it.qty} = ${it.line_total:.2f}")
+                service_name = it.service.name
+                qty = it.qty
+                total = it.line_total
+                lines.append(
+                    f"- {service_name} × {qty} = ${total:.2f}"
+                )
             lines.append(f"\nTotal: ${order.total:.2f}")
             body = "\n".join(lines)
 
@@ -41,20 +55,28 @@ class StripeWHHandler:
 
         try:
             order = (
-                Order.objects
-                .select_related()
+                Order.objects.select_related()
                 .prefetch_related("items")
                 .get(stripe_pid=pid)
             )
         except Order.DoesNotExist:
-            return HttpResponse(content=f"PI succeeded but order not found for pid={pid}", status=200)
+            return HttpResponse(
+                content=f"PI succeeded but order not found for pid={pid}",
+                status=200,
+            )
 
         if not order.is_paid:
             order.is_paid = True
             order.save(update_fields=["is_paid"])
             self._send_confirmation_email(order)
 
-        return HttpResponse(content=f"Order #{order.id} marked paid", status=200)
+        return HttpResponse(
+            content=f"Order #{order.id} marked paid",
+            status=200,
+        )
 
     def handle_payment_intent_payment_failed(self, event):
-        return HttpResponse(content="Payment failed event received", status=200)
+        return HttpResponse(
+            content="Payment failed event received",
+            status=200,
+        )

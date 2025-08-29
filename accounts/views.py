@@ -12,7 +12,11 @@ class RequestEditForm(forms.ModelForm):
     class Meta:
         model = DesignRequest
         fields = ["instructions"]
-        widgets = {"instructions": forms.Textarea(attrs={"rows": 4})}
+        widgets = {
+            "instructions": forms.Textarea(
+                attrs={"rows": 4}
+            )
+        }
 
 
 def _can_edit(dr: DesignRequest) -> bool:
@@ -27,14 +31,18 @@ def _can_delete(dr: DesignRequest) -> bool:
 @login_required
 def profile_view(request):
     active = (
-        DesignRequest.objects
-        .filter(user=request.user, status__in=["pending", "in_progress"])
+        DesignRequest.objects.filter(
+            user=request.user,
+            status__in=["pending", "in_progress"]
+        )
         .order_by("-id")
         .prefetch_related("uploads", "service")
     )
     completed = (
-        DesignRequest.objects
-        .filter(user=request.user, status="completed")
+        DesignRequest.objects.filter(
+            user=request.user,
+            status="completed"
+        )
         .order_by("-id")
         .prefetch_related("uploads", "service")
     )
@@ -56,7 +64,6 @@ def request_edit(request, pk):
         form = RequestEditForm(request.POST, instance=dr)
         if form.is_valid():
             form.save()
-
             messages.success(request, "Request updated successfully.")
             return redirect("accounts:profile")
         else:
@@ -64,7 +71,11 @@ def request_edit(request, pk):
     else:
         form = RequestEditForm(instance=dr)
 
-    return render(request, "account/request_edit.html", {"dr": dr, "form": form})
+    return render(
+        request,
+        "account/request_edit.html",
+        {"dr": dr, "form": form},
+    )
 
 
 @login_required
@@ -72,11 +83,17 @@ def request_edit(request, pk):
 def request_delete(request, pk: int):
     dr = get_object_or_404(DesignRequest, pk=pk, user=request.user)
     if not _can_delete(dr):
-        messages.warning(request, "This request can no longer be deleted.")
+        messages.warning(
+            request,
+            "This request can no longer be deleted."
+        )
         return redirect("accounts:profile")
 
     service_name = dr.service.name
     ref = dr.id
     dr.delete()
-    messages.success(request, f"Deleted: {service_name} (Ref: #{ref}).")
+    messages.success(
+        request,
+        f"Deleted: {service_name} (Ref: #{ref})."
+    )
     return redirect("accounts:profile")

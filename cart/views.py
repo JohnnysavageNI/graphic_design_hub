@@ -18,8 +18,14 @@ def _is_ajax(request: HttpRequest) -> bool:
     )
 
 
-def _mutate_cart(session, service_id: int, *, set_to: int | None = None,
-                 delta: int | None = None, remove: bool = False) -> None:
+def _mutate_cart(
+    session,
+    service_id: int,
+    *,
+    set_to: int | None = None,
+    delta: int | None = None,
+    remove: bool = False,
+) -> None:
     cart = session.get("cart", {})
     key = str(service_id)
 
@@ -75,10 +81,11 @@ def add_to_cart(request: HttpRequest, service_id: int) -> HttpResponse:
 
     ctx = build_cart_context(request.session)
 
-    # Try to render mini-cart partial if it exists; tolerate absence.
     mini_cart_html = ""
     try:
-        mini_cart_html = render_to_string("cart/_mini_cart.html", ctx, request=request)
+        mini_cart_html = render_to_string(
+            "cart/_mini_cart.html", ctx, request=request
+        )
     except TemplateDoesNotExist:
         mini_cart_html = ""
 

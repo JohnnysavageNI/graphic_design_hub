@@ -12,7 +12,11 @@ class ProfileForm(forms.ModelForm):
 
 
 class CustomSignupForm(SignupForm):
-    full_name = forms.CharField(max_length=120, required=False, label="Full name")
+    full_name = forms.CharField(
+        max_length=120,
+        required=False,
+        label="Full name",
+    )
 
     def save(self, request):
         user = super().save(request)
@@ -27,5 +31,7 @@ class DesignRequestEditForm(forms.ModelForm):
         model = DesignRequest
         fields = ["instructions"]
         widgets = {
-            "instructions": forms.Textarea(attrs={"rows": 5, "class": "form-control"})
+            "instructions": forms.Textarea(
+                attrs={"rows": 5, "class": "form-control"}
+            )
         }

@@ -29,7 +29,9 @@ CSRF_TRUSTED_ORIGINS = [
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", 31536000))
+    SECURE_HSTS_SECONDS = int(
+        os.environ.get("SECURE_HSTS_SECONDS", 31536000)
+    )
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
@@ -38,9 +40,13 @@ STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_WH_SECRET = os.environ.get("STRIPE_WH_SECRET", "")
 
 EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend",
 )
-DEFAULT_FROM_EMAIL = "Graphic Design Hub <noreply@graphicdesignhub.com>"
+
+DEFAULT_FROM_EMAIL = (
+    "Graphic Design Hub <noreply@graphicdesignhub.com>"
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -66,7 +72,9 @@ INSTALLED_APPS = [
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+ACCOUNT_FORMS = {
+    "signup": "accounts.forms.CustomSignupForm"
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -125,7 +133,9 @@ WSGI_APPLICATION = "graphic_design_hub.wsgi.application"
 if os.environ.get("DATABASE_URL"):
     DATABASES = {
         "default": dj_database_url.parse(
-            os.environ["DATABASE_URL"], conn_max_age=600, ssl_require=False
+            os.environ["DATABASE_URL"],
+            conn_max_age=600,
+            ssl_require=False,
         )
     }
 else:
@@ -137,10 +147,30 @@ else:
     }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation"
+            ".UserAttributeSimilarityValidator"
+        )
+    },
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation"
+            ".MinimumLengthValidator"
+        )
+    },
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation"
+            ".CommonPasswordValidator"
+        )
+    },
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation"
+            ".NumericPasswordValidator"
+        )
+    },
 ]
 
 LANGUAGE_CODE = "en-us"
@@ -160,43 +190,38 @@ MEDIA_ROOT = BASE_DIR / "media"
 PROTECTED_MEDIA_ROOT = BASE_DIR / "protected_media"
 PROTECTED_MEDIA_URL = "/pmedia/"
 
-if 'USE_AWS' in os.environ:
+if "USE_AWS" in os.environ:
     AWS_S3_OBJECT_PARAMETERS = {
-        'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
-        'CacheControl': 'max-age=94608000',
+        "Expires": "Thu, 31 Dec 2099 20:00:00 GMT",
+        "CacheControl": "max-age=94608000",
     }
 
-    # Bucket Config
-    AWS_STORAGE_BUCKET_NAME = 'graphicdesignhub'
-    AWS_S3_REGION_NAME = 'eu-north-1'
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_STORAGE_BUCKET_NAME = "graphicdesignhub"
+    AWS_S3_REGION_NAME = "eu-north-1"
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    AWS_S3_CUSTOM_DOMAIN = (
+        f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    )
 
-    # Static and media files
-    STATICFILES_STORAGE = 'custom_storages.StaticStorage'
-    STATICFILES_LOCATION = 'static'
-    DEFAULT_FILE_STORAGE = 'custom_storages.MediaStorage'
-    MEDIAFILES_LOCATION = 'media'
+    STATICFILES_STORAGE = "custom_storages.StaticStorage"
+    STATICFILES_LOCATION = "static"
+    DEFAULT_FILE_STORAGE = "custom_storages.MediaStorage"
+    MEDIAFILES_LOCATION = "media"
 
-    # Override static and media URLs in production
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/"
 
-if 'DEVELOPMENT' in os.environ:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'graphicdesignhub@example.com'
-
+if "DEVELOPMENT" in os.environ:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "graphicdesignhub@example.com"
 else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_USE_TLS = True
     EMAIL_PORT = 587
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS')
-    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+    EMAIL_HOST = "smtp.gmail.com"
+    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASS")
+    DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

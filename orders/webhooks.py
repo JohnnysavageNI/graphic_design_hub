@@ -20,14 +20,18 @@ def stripe_webhook(request):
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
 
     try:
-        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
     except (ValueError, stripe.error.SignatureVerificationError):
         return HttpResponse(status=400)
 
     handler = StripeWHHandler(request)
     event_map = {
         "payment_intent.succeeded": handler.handle_payment_intent_succeeded,
-        "payment_intent.payment_failed": handler.handle_payment_intent_payment_failed,
+        "payment_intent.payment_failed": (
+            handler.handle_payment_intent_payment_failed
+        ),
     }
 
     return event_map.get(event.get("type"), handler.handle_event)(event)

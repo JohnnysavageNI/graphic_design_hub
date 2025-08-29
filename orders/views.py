@@ -42,7 +42,9 @@ def _cart_items_from_ctx(ctx: Dict) -> list[dict]:
 
 def _send_checkout_email(to_email: str, context: Dict) -> None:
     try:
-        subject = render_to_string("orders/email_confirmation_subject.txt", context).strip()
+        subject = render_to_string(
+            "orders/email_confirmation_subject.txt", context
+        ).strip()
         body = render_to_string("orders/email_confirmation.txt", context)
     except TemplateDoesNotExist:
         lines = [
@@ -51,9 +53,16 @@ def _send_checkout_email(to_email: str, context: Dict) -> None:
             "",
         ]
         for it in context.get("items", []):
-            lines.append(f"- {it['service'].name} × {it['qty']} = ${it['line_total']:.2f}")
+            service_name = it["service"].name
+            qty = it["qty"]
+            total = it["line_total"]
+            lines.append(
+                f"- {service_name} × {qty} = ${total:.2f}"
+            )
         lines.append("")
-        lines.append(f"Total: ${context.get('total', Decimal('0.00')):.2f}")
+        lines.append(
+            f"Total: ${context.get('total', Decimal('0.00')):.2f}"
+        )
         if context.get("instructions"):
             lines.append("")
             lines.append("Instructions:")
@@ -91,7 +100,10 @@ def checkout(request):
         if form.is_valid():
             created_requests: List[DesignRequest] = []
 
-            full_name = form.cleaned_data.get("full_name") or request.user.get_username()
+            full_name = (
+                form.cleaned_data.get("full_name")
+                or request.user.get_username()
+            )
             email = form.cleaned_data.get("email") or request.user.email
             instructions = form.cleaned_data.get("instructions", "")
 
@@ -113,9 +125,15 @@ def checkout(request):
                 first_request = created_requests[0]
                 for f in files:
                     if hasattr(OrderUpload, "original_file"):
-                        OrderUpload.objects.create(request=first_request, original_file=f)
+                        OrderUpload.objects.create(
+                            request=first_request,
+                            original_file=f,
+                        )
                     else:
-                        OrderUpload.objects.create(request=first_request, file=f)
+                        OrderUpload.objects.create(
+                            request=first_request,
+                            file=f,
+                        )
 
             email_to = email
             email_ctx = {
@@ -123,17 +141,32 @@ def checkout(request):
                 "email": email_to,
                 "instructions": instructions,
                 "items": _cart_items_from_ctx(ctx),
-                "total": Decimal(str(ctx.get("cart_subtotal") or ctx.get("grand_total") or "0.00")),
+                "total": Decimal(
+                    str(
+                        ctx.get("cart_subtotal")
+                        or ctx.get("grand_total")
+                        or "0.00"
+                    )
+                ),
             }
             if email_to:
                 _send_checkout_email(email_to, email_ctx)
 
-            messages.success(request, "Order submitted. We’ll email you once it’s processed.")
-            return redirect("orders:checkout_success", request_id=created_requests[0].id if created_requests else 0)
+            messages.success(
+                request,
+                "Order submitted. We’ll email you once it’s processed."
+            )
+            return redirect(
+                "orders:checkout_success",
+                request_id=created_requests[0].id if created_requests else 0,
+            )
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        initial = {"full_name": request.user.get_username(), "email": request.user.email}
+        initial = {
+            "full_name": request.user.get_username(),
+            "email": request.user.email,
+        }
         form = CheckoutForm(initial=initial)
 
     return render(
@@ -185,7 +218,10 @@ def stripe_webhook(request):
 
 @login_required(login_url="/accounts/login/")
 def download_upload(request, upload_id: int):
-    up = get_object_or_404(OrderUpload.objects.select_related("request__user"), pk=upload_id)
+    up = get_object_or_404(
+        OrderUpload.objects.select_related("request__user"),
+        pk=upload_id,
+    )
     if (up.request.user_id != request.user.id) and (not request.user.is_staff):
         raise Http404("Not found")
 

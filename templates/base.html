@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Professional graphic design services tailored to your brand. Logos, posters, social media, and more — made simple.">
+    <meta name="keywords" content="graphic design, logo design, branding, posters, social media graphics, ireland design services">
   {% endblock %}
 
   {% block extra_meta %}{% endblock %}
@@ -79,7 +81,6 @@
   <script src="{% static 'js/messages.js' %}"></script>
 {% endblock %}
 
-{# Cart toast (server-rendered only for cart_toast messages) #}
 {% if messages %}
   <div id="cart-toast-server" class="position-fixed p-3" style="top: 80px; right: 20px; z-index: 2000;">
     {% for message in messages %}
@@ -90,7 +91,6 @@
   </div>
 {% endif %}
 
-{# Auth popups data (excluding cart_toast) #}
 {% if messages %}
   <div id="auth-messages-data" class="d-none">
     {% for message in messages %}
@@ -103,6 +103,30 @@
 <div id="auth-toast-root" aria-live="polite" aria-atomic="true"></div>
 
 <div id="toast-root" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Footer -->
+<footer class="footer mt-auto py-3 bg-cinematic text-white">
+  <p class="m-0 text-center text-white">
+    {% block copyright %}
+      Graphic Design Hub - efficient and high quality service 
+    {% endblock copyright %}
+  </p>
+  <p class="m-0 text-center text-white">
+    Follow us:
+    <a href="https://facebook.com" target="_blank" rel="nofollow" class="text-white ms-3">
+      <i class="fab fa-facebook-square"></i>
+    </a>
+    <a href="https://twitter.com" target="_blank" rel="nofollow" class="text-white ms-3">
+      <i class="fab fa-twitter-square"></i>
+    </a>
+    <a href="https://instagram.com" target="_blank" rel="nofollow" class="text-white ms-3">
+      <i class="fab fa-instagram-square"></i>
+    </a>
+    <a href="https://youtube.com" target="_blank" rel="nofollow" class="text-white ms-3">
+      <i class="fab fa-youtube-square"></i>
+    </a>
+  </p>
+</footer>
 
 </body>
 </html>

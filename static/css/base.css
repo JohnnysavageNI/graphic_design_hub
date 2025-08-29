@@ -1,19 +1,27 @@
 html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   padding-top: 72px;
   background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.75)),
               url('/media/homepage_background_cropped.jpg') no-repeat center center fixed;
   background-size: cover;
   color: #555;
   font-family: 'Lato', sans-serif;
-  min-height: 100vh;
   overflow-x: hidden;
 }
 
+main {
+  flex: 1;
+}
+
+/* Icons */
 .icon {
   align-items: center;
   display: inline-flex;
@@ -22,12 +30,15 @@ body {
   width: 1.5rem;
 }
 
+/* Branding */
 .logo-font { text-transform: uppercase; }
 .main-logo-link { width: fit-content; }
 
+/* Utility */
 .text-black { color: #000 !important; }
 .border-black { border: 1px solid black !important; }
 
+/* Buttons */
 .shop-now-button {
   background: rgb(148, 9, 9);
   color: #fff;
@@ -51,6 +62,7 @@ body {
 .btn-primary { background: rgb(148, 9, 9); border: none; }
 .btn-primary:hover { background: #a00; }
 
+/* Cards */
 .card {
   border-radius: 10px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -66,8 +78,10 @@ body {
   border-top-right-radius: 10px;
 }
 
+/* Page headers */
 .page-header { padding-top: 30px; }
 
+/* Hero section */
 .hero-section {
   min-height: calc(100vh - 72px);
   display: flex;
@@ -84,6 +98,7 @@ body {
 }
 .hero-image:hover { transform: scale(1.06); }
 
+/* Toasts */
 .toast,
 .toast-cart { z-index: 2000; }
 
@@ -97,6 +112,7 @@ body {
   padding-right: 0.5rem;
 }
 
+/* Cart rows */
 .list-group-item.cart-row {
   display: flex;
   align-items: center;
@@ -112,6 +128,7 @@ body {
   white-space: nowrap;
 }
 
+/* Auth Toasts */
 #auth-toast-root{
   position: fixed;
   top: 72px;
@@ -151,6 +168,18 @@ body {
   margin-left: auto; opacity: .85; cursor: pointer;
 }
 .auth-popup .close-btn:hover{ opacity: 1; }
+
+.bg-cinematic {
+  background: linear-gradient(135deg, #1a1a1a, #333333, #1a1a1a);
+  background-size: 200% 200%;
+  animation: gradientMove 8s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 @media (min-width: 1200px) {
   .container { max-width: 80%; }

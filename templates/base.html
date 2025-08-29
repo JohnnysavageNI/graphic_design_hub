@@ -31,7 +31,7 @@
 
   <title>Graphic Design Hub {% block extra_title %}{% endblock %}</title>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <header>
   <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
     <div class="container">
@@ -73,8 +73,11 @@
   </nav>
 </header>
 
-{% block page_header %}{% endblock %}
-{% block content %}{% endblock %}
+<!-- Main content -->
+<main role="main" class="flex-shrink-0">
+  {% block page_header %}{% endblock %}
+  {% block content %}{% endblock %}
+</main>
 
 {% block postloadjs %}
   <script src="{% static 'js/toasts.js' %}"></script>
@@ -101,7 +104,6 @@
   </div>
 {% endif %}
 <div id="auth-toast-root" aria-live="polite" aria-atomic="true"></div>
-
 <div id="toast-root" aria-live="polite" aria-atomic="true"></div>
 
 <!-- Footer -->

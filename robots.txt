@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https:graphic-design-hub-5b62ec6c28b6.herokuapp.com/sitemap.xml

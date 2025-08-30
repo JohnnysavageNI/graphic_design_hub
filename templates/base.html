@@ -6,24 +6,36 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Professional graphic design services tailored to your brand. Logos, posters, social media, and more — made simple.">
-    <meta name="keywords" content="graphic design, logo design, branding, posters, social media graphics, ireland design services">
+    <meta name="description"
+          content="Professional graphic design services tailored to your brand. Logos, posters, social media, and more — made simple.">
+    <meta name="keywords"
+          content="graphic design, logo design, branding, posters, social media graphics, ireland design services">
   {% endblock %}
 
   {% block extra_meta %}{% endblock %}
 
   {% block corecss %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&display=swap">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Lato&display=swap">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
   {% endblock %}
-
+  
   {% block corejs %}
     <script src="https://kit.fontawesome.com/3348633986.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
     <script src="https://js.stripe.com/v3/"></script>
   {% endblock %}
 
@@ -39,32 +51,50 @@
         <strong>Graphic Design</strong> Hub
       </a>
 
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMenu"
-              aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+              data-target="#navbarMenu"
+              aria-controls="navbarMenu" aria-expanded="false"
+              aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarMenu">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}">Services</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'service_list' %}">Services</a>
+          </li>
 
           {% if request.user.is_authenticated %}
             {% if request.user.is_superuser %}
-              <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+              </li>
             {% endif %}
             {% if request.user.is_authenticated and not request.user.is_superuser %}
-              <li class="nav-item"><a class="nav-link" href="{% url 'accounts:profile' %}">My Profile</a></li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'accounts:profile' %}">My Profile</a>
+              </li>
             {% endif %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'account_logout' %}">Logout</a>
+            </li>
           {% else %}
-            <li class="nav-item"><a class="nav-link" href="{% url 'account_signup' %}">Register</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'account_signup' %}">Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'account_login' %}">Login</a>
+            </li>
           {% endif %}
 
           <li class="nav-item position-relative" id="cart-link-wrap">
             <a href="{% url 'view_cart' %}" class="nav-link" id="cart-link">
               <i class="fas fa-shopping-bag"></i>
-              {% if grand_total %} ${{ grand_total|floatformat:2 }} {% else %} $0.00 {% endif %}
+              {% if grand_total %}
+                ${{ grand_total|floatformat:2 }}
+              {% else %}
+                $0.00
+              {% endif %}
             </a>
           </li>
         </ul>
@@ -85,7 +115,8 @@
 {% endblock %}
 
 {% if messages %}
-  <div id="cart-toast-server" class="position-fixed p-3" style="top: 80px; right: 20px; z-index: 2000;">
+  <div id="cart-toast-server" class="position-fixed p-3"
+       style="top: 80px; right: 20px; z-index: 2000;">
     {% for message in messages %}
       {% if 'cart_toast' in message.tags %}
         <div class="toast-container mb-2">{{ message|safe }}</div>
@@ -98,7 +129,10 @@
   <div id="auth-messages-data" class="d-none">
     {% for message in messages %}
       {% if not 'cart_toast' in message.tags %}
-        <div class="auth-msg" data-level="{{ message.tags|default:'info'|escape }}">{{ message }}</div>
+        <div class="auth-msg"
+             data-level="{{ message.tags|default:'info'|escape }}">
+          {{ message }}
+        </div>
       {% endif %}
     {% endfor %}
   </div>
@@ -107,28 +141,79 @@
 <div id="toast-root" aria-live="polite" aria-atomic="true"></div>
 
 <!-- Footer -->
-<footer class="footer mt-auto py-3 text-white">
+<footer class="footer mt-auto py-3">
   <p class="m-0 text-center text-white">
     {% block copyright %}
-      Graphic Design Hub - efficient and high quality service 
+      Graphic Design Hub - efficient and high quality service
     {% endblock copyright %}
   </p>
-  <p class="m-0 text-center text-white">
-    Follow us:
-    <a href="https://facebook.com" target="_blank" rel="nofollow" class="text-white ms-3">
-      <i class="fab fa-facebook-square"></i>
-    </a>
-    <a href="https://twitter.com" target="_blank" rel="nofollow" class="text-white ms-3">
-      <i class="fab fa-twitter-square"></i>
-    </a>
-    <a href="https://instagram.com" target="_blank" rel="nofollow" class="text-white ms-3">
-      <i class="fab fa-instagram-square"></i>
-    </a>
-    <a href="https://youtube.com" target="_blank" rel="nofollow" class="text-white ms-3">
-      <i class="fab fa-youtube-square"></i>
-    </a>
-  </p>
+
+  <!-- Mailchimp form -->
+  <div id="mc_embed_signup">
+    <form action="https://herokuapp.us11.list-manage.com/subscribe/post?u=237a6765548848b4687ce3af5&amp;id=266038ad0f&amp;f_id=0010e8e1f0"
+          method="post"
+          id="mc-embedded-subscribe-form"
+          name="mc-embedded-subscribe-form"
+          class="validate" target="_blank">
+      <div id="mc_embed_signup_scroll">
+        <h2>Subscribe</h2>
+        <div class="indicates-required">
+          <span class="asterisk">*</span> indicates required
+        </div>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Email Address <span class="asterisk">*</span></label>
+          <input type="email" name="EMAIL" class="required email"
+                 id="mce-EMAIL" required>
+        </div>
+        <div id="mce-responses" class="clear foot">
+          <div class="response" id="mce-error-response"
+               style="display:none;"></div>
+          <div class="response" id="mce-success-response"
+               style="display:none;"></div>
+        </div>
+        <div aria-hidden="true" style="position:absolute; left:-5000px;">
+          <input type="text" name="b_237a6765548848b4687ce3af5_266038ad0f"
+                 tabindex="-1" value="">
+        </div>
+        <div class="optionalParent">
+          <div class="clear foot">
+            <input type="submit" name="subscribe"
+                   id="mc-embedded-subscribe"
+                   class="button" value="Subscribe">
+            <p style="margin:0 auto;">
+              <a href="http://eepurl.com/jmiboc"
+                 title="Mailchimp - email marketing made easy and fun">
+                <span style="display:inline-block; background-color:transparent; border-radius:4px;">
+                  <img class="refferal_badge"
+                       src="https://digitalasset.intuit.com/render/content/dam/intuit/mc-fe/en_us/images/intuit-mc-rewards-text-dark.svg"
+                       alt="Intuit Mailchimp"
+                       style="width:220px; height:40px; display:flex; padding:2px 0; justify-content:center; align-items:center;">
+                </span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </footer>
 
+<!-- Mailchimp scripts -->
+<script src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"
+        type="text/javascript"></script>
+<script type="text/javascript">
+  (function($) {
+    window.fnames = new Array();
+    window.ftypes = new Array();
+    fnames[0] = 'EMAIL'; ftypes[0] = 'email';
+    fnames[1] = 'FNAME'; ftypes[1] = 'text';
+    fnames[2] = 'LNAME'; ftypes[2] = 'text';
+    fnames[3] = 'ADDRESS'; ftypes[3] = 'address';
+    fnames[4] = 'PHONE'; ftypes[4] = 'phone';
+    fnames[5] = 'BIRTHDAY'; ftypes[5] = 'birthday';
+    fnames[6] = 'COMPANY'; ftypes[6] = 'text';
+  }(jQuery));
+  var $mcj = jQuery.noConflict(true);
+</script>
 </body>
 </html>

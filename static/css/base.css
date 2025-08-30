@@ -229,6 +229,18 @@ footer.footer a:hover {
   background: #a00;
 }
 
+#mc_embed_signup .response {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+#mc_embed_signup #mce-error-response {
+  color: #ff6b6b;
+}
+
+#mc_embed_signup #mce-success-response {
+  color: #28a745;
+}
 
 @keyframes gradientMove {
   0% { background-position: 0% 50%; }
